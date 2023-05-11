@@ -59,13 +59,15 @@ struct CompileCommandEntry <'a>{
     output: &'a str
 }
 
+const DEFAULT_COMPILER: &str = "/usr/bin/cc";
+
 fn toml_to_config_entry(toml_array: &toml::Value) -> ConfigEntry {
     let cfg = ConfigEntry {
         compiler: toml_array
             .get("compiler")
-            .unwrap_or(&toml::Value::String(String::from("/usr/bin/cc")))
+            .unwrap_or(&toml::Value::String(String::from(DEFAULT_COMPILER)))
             .as_str()
-            .unwrap_or(&String::from("/usr/bin/cc"))
+            .unwrap_or(&String::from(DEFAULT_COMPILER))
             .to_string(),
         flags: toml_array
             .get("flags")
