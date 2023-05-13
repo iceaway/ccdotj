@@ -22,7 +22,7 @@ pub fn visit_dirs(root: &Path, dir: &Path, config: &Config, file: &mut File) -> 
             let path = entry?.path();
 
             if path.is_dir() {
-                if realdir == realroot {
+                if realdir == realroot && config.general.include_dirs.len() > 0 {
                     if config
                         .general
                         .include_dirs
@@ -31,7 +31,17 @@ pub fn visit_dirs(root: &Path, dir: &Path, config: &Config, file: &mut File) -> 
                         visit_dirs(root, &path, config, file)?;
                     }
                 } else {
-                    visit_dirs(root, &path, config, file)?;
+                    if config.general.exclude_dirs.len() > 0 {
+                        if config
+                            .general
+                            .exclude_dirs
+                            .iter()
+                            .any(|x| path.file_name() != Some(OsStr::new(x))) {
+                            visit_dirs(root, &path, config, file)?;
+                        }
+                    } else {
+                        visit_dirs(root, &path, config, file)?;
+                    }
                 }
             } else {
                 let Some(file_name) = path.file_name() else {
